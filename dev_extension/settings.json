@@ -1,0 +1,11 @@
+{
+  "_readme": "Demo configuration, used only when the extension is loaded unpacked (dev_extension/ or dist/extension/) and no browser policy is set. Not included in the Chrome Web Store package: the store version is configured by policy only (see policy/).",
+  "rumEnabled": true,
+  "siteConfig_1": { "domain": "en.wikipedia.org", "mode": "monitor" },
+  "customPCName": "DEMO-PC-01",
+  "organizationName": "Demo Organization",
+  "autoExport": {
+    "enabled": true,
+    "schedules": [ { "time": "18:00" } ]
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "generatedAt": "2026-10-20T04:08:08.913Z",
+  "diagnosticSchemaVersion": 3,
+  "extension": {
+    "name": "RUM Monitor — Web App Performance",
+    "version": "1.17.5",
+    "versionName": null,
+    "manifestVersion": 3,
+    "extensionId": "pdjcoibfcafijmnldanjoemapjelmmhm"
+  },
+  "sendQueue": {
+    "sendModule": "absent",
+    "sendingEnabled": false,
+    "queueLength": 0,
+    "approxBytes": 2,
+    "oldestEventAgeMs": null,
+    "newestEventAgeMs": null,
+    "lastFlushAt": null,
+    "lastFlushOk": null,
+    "lastFlushStatus": null,
+    "lastFlushError": null,
+    "flushCountSinceStartup": 0,
+    "failedFlushCountSinceStartup": 0,
+    "droppedByCapSinceStartup": 0
+  },
+  "riskFlags": [],
+  "recommendations": []
+}

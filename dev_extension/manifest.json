@@ -1,0 +1,42 @@
+{
+  "manifest_version": 3,
+  "name": "__MSG_extName__",
+  "version": "1.17.5",
+  "description": "__MSG_extDescription__",
+  "default_locale": "en",
+
+  "permissions": [
+    "storage",
+    "downloads",
+    "alarms"
+  ],
+
+  "host_permissions": ["<all_urls>"],
+
+  "storage": {
+    "managed_schema": "schema.json"
+  },
+
+  "background": {
+    "service_worker": "background.js"
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["services/siteConfig/match.js", "lib/web-vitals.iife.js", "metrics/registry.js", "services/analysis/sanitizeText.js", "services/timing/operationTiming.js", "services/vitals/resultVitals.js", "content.js"],
+      "run_at": "document_start"
+    }
+  ],
+
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "RUM Monitor"
+  },
+
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}

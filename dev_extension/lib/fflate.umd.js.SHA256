@@ -1,0 +1,10 @@
+package: fflate
+version: 0.8.2
+vendored_at: 2026-05-06
+source: npm pack fflate@0.8.2
+source_tarball: https://registry.npmjs.org/fflate/-/fflate-0.8.2.tgz
+source_tarball_shasum: fc8631f5347812ad6028bbe4a2308b2792aa1dea
+source_tarball_integrity: sha512-cPJU47OaAoCbg0pBvzsgpTPhmhqI5eJjh/JIu8tPj5q+T7iLvW/JAYUqmE7KOB4R1ZyEhzBaIQpQpardBF5z8A==
+source_path: package/umd/index.js
+artifact: fflate.umd.js
+sha256: C3B34F2E9F5E74D4D7D64E01CAC7A0C01954C6C406414D42185C7B53D6875DDF

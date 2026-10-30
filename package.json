@@ -1,0 +1,22 @@
+{
+  "name": "rum-data-collector",
+  "version": "1.17.5",
+  "private": true,
+  "description": "RUM Data Collector — Chrome MV3 extension build pipeline",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "build": "node build.mjs",
+    "dev": "node build.mjs --watch",
+    "package": "node package-cws.mjs"
+  },
+  "dependencies": {
+    "fflate": "0.8.2",
+    "web-vitals": "5.2.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.21.0"
+  }
+}

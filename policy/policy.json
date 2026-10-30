@@ -1,0 +1,11 @@
+{
+  "_comment": "Demo policy for set-policy.ps1. Names starting with _ are not written.",
+  "rumEnabled": true,
+  "siteConfig_1": { "domain": "en.wikipedia.org", "mode": "monitor" },
+  "customPCName": "DEMO-PC-01",
+  "organizationName": "Demo Organization",
+  "autoExport": {
+    "enabled": true,
+    "schedules": [ { "time": "18:00" } ]
+  }
+}

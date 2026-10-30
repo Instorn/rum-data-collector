@@ -1,0 +1,3 @@
+# Keep every file byte-for-byte (no line-ending conversion): the build checks
+# SHA-256 of dev_extension/lib/*.js, and the store ZIP hash depends on exact bytes.
+* -text

@@ -1,0 +1,438 @@
+{
+  "type": "object",
+  "properties": {
+    "customPCName": {
+      "type": "string",
+      "description": "PC name for identification"
+    },
+    "customPCNameCpu": {
+      "type": "string",
+      "description": "managed policy / registry only; metadata only for 04 reports; not shown in UI"
+    },
+    "customPCNameRum": {
+      "type": "string",
+      "description": "managed policy / registry only; metadata only for 04 reports; not shown in UI"
+    },
+    "serverUrl": {
+      "type": "string",
+      "description": "RUM data server URL"
+    },
+    "rumEnabled": {
+      "type": "boolean",
+      "description": "Enable data collection"
+    },
+    "organizationName": {
+      "type": "string",
+      "description": "Organization name"
+    },
+    "department": {
+      "type": "string",
+      "description": "Department name"
+    },
+    "location": {
+      "type": "string",
+      "description": "Office location"
+    },
+    "commit1": {
+      "type": "string",
+      "description": "Free-text comment 1; settings.json or registry; metadata only for 04 reports; not shown in UI"
+    },
+    "commit2": {
+      "type": "string",
+      "description": "Free-text comment 2; settings.json or registry; metadata only for 04 reports; not shown in UI"
+    },
+    "disabledMetrics": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "List of metric IDs to disable (e.g. [\"inp\", \"cls\"]). Disabled metrics are not collected and not displayed. Matches IDs from METRICS_REGISTRY."
+    },
+    "useSettingsFile": {
+      "type": "integer",
+      "description": "[TEMP:prepilot] Set to 1 to force reading settings.json instead of registry. 0 or absent = use registry."
+    },
+    "diagnosticsMode": {
+      "type": "boolean",
+      "description": "compact: не используется — ключ полной версии, значение игнорируется."
+    },
+    "autoExport": {
+      "type": "object",
+      "description": "fix-8: Auto-export of the role-bundle ZIP by local time. cleanupAfterExport removes only accumulated RUM records older than 1 hour AFTER a successful export of that schedule. Preferred over legacy autoExportEnabled/autoExportTimes; if this block is absent, legacy keys are used with cleanupAfterExport=false. In settings.json this is a native JSON object; in managed storage / registry it may be provided as a JSON-encoded string (REG_SZ), like siteConfig_N — the runtime parses the string. enabled must be exactly true to create alarms; absent or non-true enabled disables auto-export.",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "true — auto-export enabled; false — auto-export disabled (no auto-export alarms are created)."
+        },
+        "schedules": {
+          "type": "array",
+          "description": "List of local auto-export times. Any number of schedules is allowed. Invalid times are skipped with a console warning; duplicate times are de-duplicated.",
+          "items": {
+            "type": "object",
+            "required": ["time"],
+            "properties": {
+              "time": {
+                "type": "string",
+                "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
+                "description": "Local auto-export start time in HH:MM (00:00–23:59)."
+              },
+              "cleanupAfterExport": {
+                "type": "boolean",
+                "description": "If true, only accumulated RUM records older than 1 hour are removed after a successful export of this schedule. Absent = false."
+              }
+            }
+          }
+        }
+      }
+    },
+    "autoExportEnabled": {
+      "type": "boolean",
+      "description": "Legacy: enables auto-export. For new settings use autoExport.enabled. Ignored when the autoExport block is present."
+    },
+    "autoExportTimes": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Legacy: list of HH:MM times without cleanupAfterExport support (cleanup is always off for legacy times). In managed storage / registry may be a JSON-encoded string (REG_SZ), e.g. \"[\\\"10:00\\\",\\\"17:00\\\"]\". For new settings use autoExport.schedules. Ignored when the autoExport block is present."
+    },
+    "siteConfig_1": {
+      "type": "string",
+      "description": "Per-site config as JSON string (REG_SZ). Example: {\"domain\":\"crm.company.com\",\"mode\":\"both\"}. Supports wildcards: *.company.com, *. compact fix-8: внутри строки Chrome поля не проверяет; в массиве siteConfigs — проверяет по items."
+    },
+    "siteConfig_2": {
+      "type": "string",
+      "description": "Per-site config as JSON string (REG_SZ). See siteConfig_1 description."
+    },
+    "siteConfig_3": {
+      "type": "string",
+      "description": "Per-site config as JSON string (REG_SZ). See siteConfig_1 description."
+    },
+    "siteConfigsJson": {
+      "type": "string",
+      "description": "Per-site monitoring configuration as a JSON-encoded string (legacy fallback). Example: [{\"domain\":\"crm.company.com\",\"mode\":\"both\"}]"
+    },
+    "discoveryConsoleLog": {
+      "type": "object",
+      "description": "compact: не используется — ключ полной версии, значение игнорируется. [diagnostic][TEMP:prepilot] Глобальная настройка диагностического логирования discovery-селекторов в консоль страницы. domain — для какого сайта (поддерживает wildcards). durationMin — сколько минут логировать после загрузки страницы (0 = без ограничений). Удалить перед production.",
+      "properties": {
+        "domain": {
+          "type": "string",
+          "description": "Hostname для которого включить логирование (например: example.com, *.company.com, *)"
+        },
+        "durationMin": {
+          "type": "integer",
+          "description": "Сколько минут после загрузки страницы логировать. 0 = без ограничений."
+        }
+      }
+    },
+    "performanceMonitoring": {
+      "type": "object",
+      "description": "compact: не используется — ключ полной версии, значение игнорируется. Feature-4: настройки периодического сбора performance-метрик вкладки.",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "true (default) — сбор включён; false — сервис не стартует."
+        },
+        "preset": {
+          "type": "string",
+          "enum": ["minimal", "extended", "custom"],
+          "description": "minimal: tabMemory+extensionCpu+extensionNetwork (300 сек). extended: полный набор (60 сек). custom: ручное управление через features.*."
+        },
+        "intervalSec": {
+          "type": "integer",
+          "description": "Интервал сбора в секундах. Переопределяет дефолт пресета."
+        },
+        "features": {
+          "type": "object",
+          "description": "Активируется только при preset=custom. Каждый флаг включает отдельный коллектор.",
+          "properties": {
+            "tabMemory":        { "type": "boolean", "description": "JS heap (performance.memory)." },
+            "extensionCpu":     { "type": "boolean", "description": "Navigation Timing: domInteractive, domComplete, processingTime." },
+            "extensionNetwork": { "type": "boolean", "description": "Resource entries: кол-во, суммарный размер, среднее время." },
+            "domComplexity":    { "type": "boolean", "description": "Кол-во DOM-узлов и максимальная глубина дерева." },
+            "connectionInfo":   { "type": "boolean", "description": "Network Information API: effectiveType, downlink, rtt." },
+            "fpsEstimate":      { "type": "boolean", "description": "Оценка FPS через requestAnimationFrame за 1 секунду." }
+          }
+        }
+      }
+    },
+    "error_tracker_rate_limit": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 200,
+      "description": "compact: не используется — ключ полной версии, значение игнорируется. fix-3 error-tracker: Maximum JS error events sent per minute per tab. Default: 20."
+    },
+    "error_tracker_dedup_ttl_ms": {
+      "type": "integer",
+      "minimum": 1000,
+      "maximum": 300000,
+      "description": "compact: не используется — ключ полной версии, значение игнорируется. fix-3 error-tracker: Deduplication TTL in ms — same error will not be re-sent within this window. Default: 10000."
+    },
+    "executiveSummaryThresholds": {
+      "type": "object",
+      "description": "fix-1/fix-7/fix-21: Пороги для отчёта 04 (CSV и JSON). Каждая метрика: { warn, crit }. Отсутствующие ключи берутся из built-in defaults. 04 читает typical_load_sec и slow_load_sec; алиасы avg_load_sec↔typical_load_sec и p95_load_sec↔slow_load_sec разрешаются в export-слое. Остальные свойства не используются с 1.14.20.",
+      "properties": {
+        "typical_load_sec":    { "type": "object", "description": "04: типичное время операции. warn/crit в секундах. Default: {warn:3.0, crit:5.0}.", "properties": { "warn": { "type": "number" }, "crit": { "type": "number" } } },
+        "slow_load_sec":       { "type": "object", "description": "04: медленная операция. warn/crit в секундах. Default: {warn:5.0, crit:10.0}.", "properties": { "warn": { "type": "number" }, "crit": { "type": "number" } } },
+        "slow_rate_pct":       { "type": "object", "description": "Доля медленных загрузок в %. Не используется с 1.14.20 (отчёты 01–03 удалены), оставлено для совместимости с политикой.", "properties": { "warn": { "type": "number" }, "crit": { "type": "number" } } },
+        "freeze_count":        { "type": "object", "description": "Количество freeze-инцидентов. Не используется с 1.14.20 (отчёты 01–03 удалены), оставлено для совместимости с политикой.", "properties": { "warn": { "type": "number" }, "crit": { "type": "number" } } },
+        "blank_count":         { "type": "object", "description": "Количество blank-page инцидентов. Не используется с 1.14.20 (отчёты 01–03 удалены), оставлено для совместимости с политикой.", "properties": { "warn": { "type": "number" }, "crit": { "type": "number" } } },
+        "lcp_sec":             { "type": "object", "description": "LCP в секундах. Не используется с 1.14.20 (отчёты 01–03 удалены), оставлено для совместимости с политикой.", "properties": { "warn": { "type": "number" }, "crit": { "type": "number" } } },
+        "cls_score":           { "type": "object", "description": "CLS score. Не используется с 1.14.20 (отчёты 01–03 удалены), оставлено для совместимости с политикой.", "properties": { "warn": { "type": "number" }, "crit": { "type": "number" } } },
+        "long_tasks_total":    { "type": "object", "description": "Суммарное кол-во long tasks. Не используется с 1.14.20 (отчёты 01–03 удалены), оставлено для совместимости с политикой.", "properties": { "warn": { "type": "number" }, "crit": { "type": "number" } } },
+        "slow_operation_count": { "type": "object", "description": "fix-7: Количество операций, где operationTimeMs превысил typical_load_sec.warn. Не используется с 1.14.20 (отчёты 01–03 удалены), оставлено для совместимости с политикой.", "properties": { "warn": { "type": "number" }, "crit": { "type": "number" } } },
+        "avg_load_sec":        { "type": "object", "description": "compact fix-8: алиас typical_load_sec, разрешается в export-слое.", "properties": { "warn": { "type": "number" }, "crit": { "type": "number" } } },
+        "p95_load_sec":        { "type": "object", "description": "compact fix-8: алиас slow_load_sec, разрешается в export-слое.", "properties": { "warn": { "type": "number" }, "crit": { "type": "number" } } },
+        "long_tasks_per_action": { "type": "object", "description": "compact fix-8: 04: порог long tasks на действие; читается только warn, default 5.", "properties": { "warn": { "type": "number" }, "crit": { "type": "number" } } }
+      }
+    },
+    "siteConfigs": {
+      "type": "array",
+      "description": "Per-site monitoring configuration. fix-8: This array is the authoritative whitelist of domains where the extension may operate. Domains NOT listed here are treated as disabled (default-deny); no telemetry is collected. Catch-all '*' is allowed only with mode=minimal or mode=disabled; monitor/both with '*' are automatically downgraded to minimal. MIGRATION WARNING: existing configs with {\"domain\":\"*\",\"mode\":\"monitor|both\"} will downgrade to minimal after fix-8 upgrade — admin should review the whitelist.",
+      "items": {
+        "type": "object",
+        "required": ["domain", "mode"],
+        "properties": {
+          "domain": {
+            "type": "string",
+            "description": "Hostname to match (e.g. crm.company.com)"
+          },
+          "mode": {
+            "type": "string",
+            "enum": ["monitor", "both", "minimal", "disabled"],
+            "description": "Monitoring mode: monitor=card timing only, both=same as monitor (kept for registry compatibility), minimal=Web Vitals + full_page_navigation only (lightweight, fix-8), disabled=no collection. compact fix-1: discovery was removed in 1.15.0 and is treated as disabled. fix-8: domains NOT listed in siteConfigs are treated as disabled (default-deny). Catch-all '*' is allowed only with mode=minimal or mode=disabled; monitor/both with '*' are automatically downgraded to minimal at runtime with a console warning."
+          },
+          "siteType": {
+            "type": "string",
+            "description": "Site category label (e.g. crm, erp, portal)"
+          },
+          "cardSelectors": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "CSS selectors for cards to track in monitor/both modes"
+          },
+          "maxCardLoadTime": {
+            "type": "integer",
+            "description": "Max expected card load time in ms (default 10000). Used in monitor/both modes."
+          },
+          "pageLoadTimeout": {
+            "type": "integer",
+            "description": "Override LCP_TIMEOUT_MS for blank-page detection in ms (default 15000). Useful for slow sites."
+          },
+          "spaNavTimeout": {
+            "type": "integer",
+            "description": "Max wait for SPA DOM stabilization after navigation click in ms (default 5000). Requires navigationSelectors."
+          },
+          "enabled": {
+            "type": "boolean",
+            "description": "Override switch; false forces disabled regardless of mode"
+          },
+          "navigationSelectors": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "CSS selectors to measure SPA navigation timing."
+          },
+          "hashNavigation": {
+            "type": "boolean",
+            "description": "fix-1 (hash-nav): opt-in режим для hash-based SPA (например pyrus.ru/#inbox). При true hash-фрагмент включается в path-discriminator координатной модели и в sanitized page_url. sessionResetPatterns матчатся по pathname+hash вместо pathname+search. Строго per-site — отсутствие поля равнозначно false и не меняет поведения других сайтов. Не включать для сайтов, где '#section' используется только как якорь."
+          },
+          "sessionResetPatterns": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "URL patterns that reset journey Y counter to 0 (new funnel start). При hashNavigation=false (default): checked against pathname+search. При hashNavigation=true: checked against pathname+hash. '/' always resets (built-in, no need to list). Examples: ['?q=', '?utm_source=', '/order/success', '/login', '#inbox']"
+          },
+          "sessionBackTtlMin": {
+            "type": "integer",
+            "description": "TTL in minutes for back-navigation detection. If a URL was visited within this window, returning to it is treated as 'back' (Y stays). 0 = disabled (always Y++). Default: 15. Examples: 5 for quick sessions, 30 for long workflows."
+          },
+          "pathRules": {
+            "type": "array",
+            "description": "fix-3: Rules for overriding Y computation on non-standard routes (wizard steps, flat catalogs). Applied before hierarchy-based Y. Pattern supports glob: * = one segment, ** = any depth.",
+            "items": {
+              "type": "object",
+              "required": ["pattern", "yBase"],
+              "properties": {
+                "pattern": {
+                  "type": "string",
+                  "description": "Glob path pattern. Examples: '/wizard/step-*', '/product/*', '/account/**'"
+                },
+                "yBase": {
+                  "type": "integer",
+                  "description": "Base Y value when path matches this pattern."
+                },
+                "yStep": {
+                  "type": "integer",
+                  "description": "Optional. Each unique path suffix gets yBase + N * yStep. 0 or absent = all matching paths share yBase."
+                }
+              }
+            }
+          },
+          "pathAliases": {
+            "type": "array",
+            "description": "fix-3: Path pairs treated as the same logical screen — Y does not change when navigating between them. Use for redirects, A/B test variants, legacy routes.",
+            "items": {
+              "type": "object",
+              "required": ["from", "to"],
+              "properties": {
+                "from": { "type": "string", "description": "Source path (e.g. '/cart')" },
+                "to":   { "type": "string", "description": "Target path (e.g. '/checkout')" }
+              }
+            }
+          },
+          "disableAjaxTiming": {
+            "type": "boolean",
+            "description": "fix-2: Disable AJAX/fetch resource timing collection for this site. Default: absent/false."
+          },
+          "ajaxMaxEventsPerPage": {
+            "type": "integer",
+            "minimum": 50,
+            "maximum": 2000,
+            "description": "fix-2: Maximum AJAX/fetch events captured per page (hard cap). Default: 500."
+          },
+          "ajaxIgnorePatterns": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "fix-2: URL patterns to exclude from AJAX timing. Supports suffix (.google-analytics.com) and contains-match (/api/heartbeat). Default: []."
+          },
+          "sanitize": {
+            "type": "object",
+            "description": "PII-sanitization settings for page_url. Click text is not collected since 1.16.0 (compact fix-2); its settings were removed.",
+            "properties": {
+              "pageUrlIdMinDigits": {
+                "type": "integer",
+                "minimum": 2,
+                "maximum": 10,
+                "description": "fix-5: Minimum digit count in a path segment to treat it as a numeric ID and mask as [id] in page_url. Default: 4. Example: value=4 → /client/1234 → /client/[id]; /client/123 → unchanged. Applies to path only, not to query parameters."
+              },
+              "pageUrlHashMaxLength": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 512,
+                "description": "fix-1 (hash-nav): Максимальная длина hash-фрагмента после '#' в sanitized page_url. Применяется только при hashNavigation=true. Позволяет ограничить длинные hash-пути (например /t#id121809188 → /t#[id] после маскировки ID). Default: absent = без ограничения длины."
+              }
+            }
+          },
+          "operationTiming": {
+            "type": "object",
+            "description": "fix-5: Настройки измерения timeline-метрик операции (operation_time_ms и связанные). Absent = enabled с defaults.",
+            "properties": {
+              "enabled": {
+                "type": "boolean",
+                "description": "false — отключает измерение; все timeline-колонки в 04 будут пустыми. Default: true."
+              },
+              "operationTimeoutMs": {
+                "type": "integer",
+                "minimum": 1000,
+                "maximum": 60000,
+                "description": "Максимальное время ожидания operation_time_ms в мс. Default: 15000."
+              },
+              "quietWindowMs": {
+                "type": "integer",
+                "minimum": 100,
+                "maximum": 5000,
+                "description": "Длительность тихого окна (без long tasks) для подтверждения интерактивности в мс. Default: 500."
+              },
+              "spaStabilityMs": {
+                "type": "integer",
+                "minimum": 50,
+                "maximum": 3000,
+                "description": "Тишина DOM-мутаций для SPA stabilization в мс. Default: 300."
+              },
+              "spaNetworkQuietMs": {
+                "type": "integer",
+                "minimum": 100,
+                "maximum": 5000,
+                "description": "Тишина сетевых запросов для SPA stabilization в мс. Default: 500."
+              },
+              "spaStabilityTimeoutMs": {
+                "type": "integer",
+                "minimum": 1000,
+                "maximum": 30000,
+                "description": "Таймаут SPA stabilization в мс. Default: 10000."
+              },
+              "spaMutationCap": {
+                "type": "integer",
+                "minimum": 50,
+                "maximum": 5000,
+                "description": "Hard cap на число DOM-мутаций за одно SPA measurement. Default: 500."
+              },
+              "ajaxBatchQuietMs": {
+                "type": "integer",
+                "minimum": 100,
+                "maximum": 5000,
+                "description": "Тишина AJAX для подтверждения data_ready_ms в мс. Default: 500."
+              },
+              "ajaxCompletionTimeoutMs": {
+                "type": "integer",
+                "minimum": 1000,
+                "maximum": 30000,
+                "description": "Таймаут ожидания AJAX completion в мс. Default: 10000."
+              },
+              "ajaxAttributionWindowMs": {
+                "type": "integer",
+                "minimum": 500,
+                "maximum": 30000,
+                "description": "Attribution window: учитываются только AJAX-запросы, стартовавшие в пределах этого окна после клика. Default: 5000."
+              },
+              "modalStabilityMs": {
+                "type": "integer",
+                "minimum": 50,
+                "maximum": 3000,
+                "description": "Тишина DOM-мутаций внутри модального элемента в мс. Default: 300."
+              },
+              "modalStabilityTimeoutMs": {
+                "type": "integer",
+                "minimum": 500,
+                "maximum": 15000,
+                "description": "Таймаут modal stabilization в мс. Default: 5000."
+              },
+              "layoutStableMs": {
+                "type": "integer",
+                "minimum": 100,
+                "maximum": 3000,
+                "description": "Тишина layout shifts для visual_stable_ms в мс. Default: 500."
+              }
+            }
+          },
+          "executiveSummaryThresholds": {
+            "type": "object",
+            "description": "compact fix-8: пороги 04 для этого сайта, приоритет над глобальными. Ключи и поля warn/crit — как у executiveSummaryThresholds верхнего уровня.",
+            "properties": {
+              "typical_load_sec": { "type": "object", "properties": { "warn": { "type": "number" }, "crit": { "type": "number" } } },
+              "slow_load_sec": { "type": "object", "properties": { "warn": { "type": "number" }, "crit": { "type": "number" } } },
+              "slow_rate_pct": { "type": "object", "properties": { "warn": { "type": "number" }, "crit": { "type": "number" } } },
+              "freeze_count": { "type": "object", "properties": { "warn": { "type": "number" }, "crit": { "type": "number" } } },
+              "blank_count": { "type": "object", "properties": { "warn": { "type": "number" }, "crit": { "type": "number" } } },
+              "lcp_sec": { "type": "object", "properties": { "warn": { "type": "number" }, "crit": { "type": "number" } } },
+              "cls_score": { "type": "object", "properties": { "warn": { "type": "number" }, "crit": { "type": "number" } } },
+              "long_tasks_total": { "type": "object", "properties": { "warn": { "type": "number" }, "crit": { "type": "number" } } },
+              "slow_operation_count": { "type": "object", "properties": { "warn": { "type": "number" }, "crit": { "type": "number" } } },
+              "avg_load_sec": { "type": "object", "properties": { "warn": { "type": "number" }, "crit": { "type": "number" } } },
+              "p95_load_sec": { "type": "object", "properties": { "warn": { "type": "number" }, "crit": { "type": "number" } } },
+              "long_tasks_per_action": { "type": "object", "properties": { "warn": { "type": "number" }, "crit": { "type": "number" } } }
+            }
+          },
+          "renderPaintTiming": {
+            "type": "boolean",
+            "description": "compact fix-8 (в схеме): false выключает Element Timing (t_paint) для watchSelectors; по умолчанию включено."
+          },
+          "watchSelectorsVersion": {
+            "type": "string",
+            "description": "compact fix-8 (в схеме): версия набора watchSelectors, до 32 символов; пусто — хэш набора."
+          },
+          "watchSelectors": {
+            "type": "array",
+            "description": "compact fix-8 (в схеме): маркеры готовности блоков: selector — CSS, label — имя маркера (по умолчанию selector), debounceMs — проверка устойчивости, по умолчанию 500. Элемент без selector или с дробным debounceMs Chrome выбрасывает.",
+            "items": {
+              "type": "object",
+              "required": ["selector"],
+              "properties": {
+                "selector":   { "type": "string" },
+                "label":      { "type": "string" },
+                "debounceMs": { "type": "integer" }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+

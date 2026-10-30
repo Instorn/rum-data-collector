@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RUM Monitor</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <!-- compact fix-9: тексты — по ключам data-i18n / data-i18n-placeholder из _locales (popup.js,
+       _applyI18n); в разметке — английский вариант (default_locale) -->
+  <div class="header">
+    <h1>RUM Monitor</h1>
+    <div class="status">
+      <span id="status-indicator" class="status-dot active"></span>
+      <span id="status-text" data-i18n="statusActive">Active</span>
+    </div>
+  </div>
+
+  <!-- Информация о ПК -->
+  <div class="pc-info-section">
+    <div class="pc-display">
+      <label data-i18n="pcNameLabel">Current PC name:</label>
+      <div id="current-pc-name" class="pc-name-display" data-i18n="pcNameDetecting">Detecting...</div>
+      <div class="help-text" data-i18n="pcNameHint">From administrator settings or a random identifier</div>
+    </div>
+    <div class="org-display">
+      <label for="organization-input" data-i18n="orgLabel">Organization:</label>
+      <input type="text" id="organization-input" class="org-input" placeholder="Enter organization name" data-i18n-placeholder="orgPlaceholder">
+      <div class="org-source-hint help-text"></div>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <!-- Агрегированная статистика -->
+    <div class="stats-section">
+      <h3 data-i18n="statsTitle">Aggregated metrics</h3>
+
+      <!-- Web Vitals — генерируется динамически по METRICS_REGISTRY в popup.js -->
+      <div id="web-vitals-section"></div>
+
+      <div class="metric-row">
+        <span class="metric-label" data-i18n="longTasksLabel">Long Tasks (share):</span>
+        <span id="long-tasks-ratio" class="metric-value">-</span>
+      </div>
+
+      <div class="metric-row">
+        <span class="metric-label" data-i18n="clickToCardLabel">Click → Card:</span>
+        <span id="click-to-card" class="metric-value">-</span>
+      </div>
+    </div>
+
+    <!-- Зависания -->
+    <div class="stats-section">
+      <h3 data-i18n="freezesTitle">Freezes</h3>
+
+      <div class="metric-row">
+        <span class="metric-label" data-i18n="freezeLabel">Freeze (hangs):</span>
+        <span id="freeze-events-count" class="metric-value">0</span>
+      </div>
+
+      <div class="metric-row">
+        <span class="metric-label" data-i18n="blankLabel">Blank page (empty):</span>
+        <span id="blank-events-count" class="metric-value">0</span>
+      </div>
+    </div>
+
+    <!-- Быстрые настройки -->
+    <div class="settings-section">
+      <h3 data-i18n="settingsTitle">Settings</h3>
+
+      <label class="setting-item">
+        <input type="checkbox" id="rum-enabled">
+        <span class="checkmark"></span>
+        <span class="label-text" data-i18n="enableCollection">Enable data collection</span>
+      </label>
+    </div>
+
+    <!-- Выгрузки -->
+    <h4 class="export-group-title" data-i18n="exportsTitle">Exports</h4>
+    <div class="export-buttons">
+      <button id="btn-export-role-bundle" class="btn btn-primary" style="font-weight:bold;" data-i18n="btnAllReports">📦 All reports (ZIP)</button>
+      <button id="btn-export-navigation-detail" class="btn btn-primary" data-i18n="btnNav04Csv">🗺 04 Navigation Detail (CSV)</button>
+      <!-- fix-8: JSON-версия 04 -->
+      <button id="btn-export-navigation-detail-json" class="btn btn-secondary" data-i18n="btnNav04Json">🗺 04 Navigation Detail (JSON)</button>
+      <button id="btn-export-settings"    class="btn btn-secondary" data-i18n="btnSettingsJson">Settings (JSON)</button>
+    </div>
+
+    <!-- Экспорт -->
+    <div class="export-buttons">
+      <button id="btn-export-ajax-details" class="btn btn-secondary" data-i18n="btnAjaxCsv">AJAX/Fetch details (CSV)</button>
+      <button id="btn-export-anomalies"   class="btn btn-secondary" data-i18n="btnAnomaliesCsv">Freezes and blank pages (CSV)</button>
+    </div>
+
+    <!-- [prepilot] Конфигурация (для отладки пре-пилота) -->
+    <div class="stats-section" id="prepilot-config-section">
+      <h3 data-i18n="configTitle">Configuration</h3>
+      <div class="info-row">
+        <span class="info-label" data-i18n="configSourceLabel">Source:</span>
+        <span id="config-source" class="info-value">-</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label" data-i18n="configSiteModeLabel">Site mode:</span>
+        <span id="config-site-mode" class="info-value">-</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">maxCardLoadTime:</span>
+        <span id="config-max-card-load-time" class="info-value">-</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">pageLoadTimeout:</span>
+        <span id="config-page-load-timeout" class="info-value">-</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">spaNavTimeout:</span>
+        <span id="config-spa-nav-timeout" class="info-value">-</span>
+      </div>
+      <div class="actions" style="margin-top:8px;margin-bottom:0">
+        <button id="btn-reload-settings" class="btn btn-secondary" data-i18n="btnReloadSettings">Reload settings</button>
+      </div>
+    </div>
+    <!-- /[prepilot] -->
+
+    <!-- Действия -->
+    <div class="actions">
+      <button id="btn-clear-data" class="btn btn-danger" data-i18n="btnClearData">Clear all data</button>
+    </div>
+
+    <!-- Информация о данных -->
+    <div class="info-section">
+      <div class="info-row">
+        <span class="info-label" data-i18n="webVitalsCountLabel">Web Vitals records:</span>
+        <span id="web-vitals-count" class="info-value">0</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label" data-i18n="aggregatedCountLabel">Aggregated records:</span>
+        <span id="aggregated-count" class="info-value">0</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label" data-i18n="collectionPeriodLabel">Collection period:</span>
+        <span id="collection-period" class="info-value">-</span>
+      </div>
+    </div>
+  </div>
+
+  <script src="metrics/registry.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

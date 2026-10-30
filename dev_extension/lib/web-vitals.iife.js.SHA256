@@ -1,0 +1,5 @@
+﻿package: web-vitals
+version: 5.2.0
+vendored_at: 2026-05-05
+source: https://unpkg.com/web-vitals@5.2.0/dist/web-vitals.iife.js
+sha256: 5c63ea0e3efcddf5efe31aec9eefd08842f7ba95df654ea98c36ac0a02741912
